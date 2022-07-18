@@ -4,7 +4,7 @@ import {
   InMemoryCache,
   HttpLink,
 } from '@apollo/client';
-import { React, useState, createContext, useEffect } from 'react';
+import { React, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 import Routes from './routes/Routes';
@@ -24,12 +24,10 @@ const createApolloClient = () => {
   });
 };
 
-export const TokenContext = createContext({});
-
 function App() {
   const [client] = useState(createApolloClient());
   const checkCookie = getCookie();
-  console.log(checkCookie, 'abc');
+
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
