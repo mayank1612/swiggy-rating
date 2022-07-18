@@ -1,5 +1,4 @@
-import React, { useContext, useState } from 'react';
-import { TokenContext } from '../App';
+import React, { useState } from 'react';
 import { Grid, TextField, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { useLazyQuery } from '@apollo/client';
@@ -8,6 +7,7 @@ import { GET_LOGGED_IN_CUSTOMER } from '../queries/GET_LOGGED_IN_CUSTOMER';
 import Progress from '../components/Progress';
 import { sendDataToSentry } from '..';
 import { useHistory } from 'react-router-dom';
+import { setCookie } from '../utils/setCookies';
 
 const useStyles = makeStyles({
   root: {
@@ -25,7 +25,6 @@ const useStyles = makeStyles({
 
 function LoginPage() {
   const history = useHistory();
-  const contextValue = useContext(TokenContext);
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -58,7 +57,7 @@ function LoginPage() {
         onCompleted: (data) => {
           if (data.customer.length > 0) {
             setValid(true);
-            contextValue.setAccessToken(credentials.username);
+            setCookie(credentials.username);
             history.push(HOME);
           } else {
             setValid(false);
