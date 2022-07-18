@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Grid, AppBar, Link } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import SwiggyLogo from '../assests/swiggy-logo.png';
-import { HOME, LOGOUT, PROFILE } from '../routes/PathConstants';
+import { HOME, LOGIN, LOGOUT, PROFILE } from '../routes/PathConstants';
+import { TokenContext } from '../App';
+import { setCookie } from '../utils/setCookies';
 
 const useStyles = makeStyles({
   root: {
@@ -33,6 +35,7 @@ const useStyles = makeStyles({
 
 function Navbar() {
   const classes = useStyles();
+  const contextValue = useContext(TokenContext);
   return (
     <AppBar position="sticky" className={classes.root}>
       <Grid container className={classes.container}>
@@ -56,7 +59,14 @@ function Navbar() {
         </Grid>
         <Grid item>
           <div className={classes.button}>
-            <Link href={LOGOUT} underline="none" className={classes.link}>
+            <Link
+              href={LOGIN}
+              underline="none"
+              className={classes.link}
+              onClick={() => {
+                setCookie('');
+              }}
+            >
               LOG OUT
             </Link>
           </div>

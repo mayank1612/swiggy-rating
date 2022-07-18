@@ -4,19 +4,19 @@ import {
   InMemoryCache,
   HttpLink,
 } from '@apollo/client';
-import { React, useEffect, useState, createContext } from 'react';
+import { React, useState, createContext, useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import Progress from './components/Progress';
+
 import Routes from './routes/Routes';
+import { getCookie } from './utils/getCookie';
 import Footer from './views/Footer';
 import Navbar from './views/Navbar';
 
-const createApolloClient = (authToken) => {
+const createApolloClient = () => {
   return new ApolloClient({
     link: new HttpLink({
       uri: `${process.env.REACT_APP_BASE_API_URL}/graphql`,
       headers: {
-        // Authorization: `Bearer ${authToken}`,
         'x-hasura-admin-secret': process.env.REACT_APP_HASURA_ADMIN_SECRET_KEY,
       },
     }),
@@ -28,30 +28,18 @@ export const TokenContext = createContext({});
 
 function App() {
   const [client] = useState(createApolloClient());
-  const [accessToken, setAccessToken] = useState();
-  const [cookieEnable, setCookieEnable] = useState(true);
-  // const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {}, [accessToken]);
-
-  // if (loading) {
-  //   return <Progress />;
-  // }
-
+  const checkCookie = getCookie();
+  console.log(checkCookie, 'abc');
   return (
-    <TokenContext.Provider
-      value={{ accessToken, setAccessToken, cookieEnable }}
-    >
-      <ApolloProvider client={client}>
-        <BrowserRouter>
-          {/* {accessToken && cookieEnable && <Navbar />} */}
-          <Navbar />
-          <Routes />
-          {/* {accessToken && cookieEnable && <Footer />} */}
-          <Footer />
-        </BrowserRouter>
-      </ApolloProvider>
-    </TokenContext.Provider>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        {checkCookie && checkCookie !== '' && <Navbar />}
+        <Navbar />
+        <Routes />
+        {checkCookie && checkCookie !== '' && <Footer />}
+        <Footer />
+      </BrowserRouter>
+    </ApolloProvider>
   );
 }
 

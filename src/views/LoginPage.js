@@ -2,8 +2,12 @@ import React, { useContext, useState } from 'react';
 import { TokenContext } from '../App';
 import { Grid, TextField, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import { GET_CUSTOMER_DETAILS } from '../queries/GET_CUSTOMER_DETAILS';
 import { useLazyQuery } from '@apollo/client';
+import { HOME } from '../routes/PathConstants';
+import { GET_LOGGED_IN_CUSTOMER } from '../queries/GET_LOGGED_IN_CUSTOMER';
+import Progress from '../components/Progress';
+import { sendDataToSentry } from '..';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles({
   root: {
@@ -20,6 +24,7 @@ const useStyles = makeStyles({
 });
 
 function LoginPage() {
+  const history = useHistory();
   const contextValue = useContext(TokenContext);
   const [credentials, setCredentials] = useState({
     username: '',
@@ -29,25 +34,40 @@ function LoginPage() {
   const classes = useStyles();
 
   const [checkCredentails, { loading, error }] = useLazyQuery(
-    GET_CUSTOMER_DETAILS
+    GET_LOGGED_IN_CUSTOMER
   );
 
-  const handleLogin = () => {
-    checkCredentails({
-      variables: {
-        username: credentials.username,
-        password: credentials.password,
-      },
-      onCompleted: (data) => {
-        console.log(data);
-        if (data.customer.length > 0) {
-          setValid(false);
-        } else {
-          setValid(true);
-          contextValue.setAccessToken();
-        }
-      },
+  if (loading) {
+    <Progress />;
+  }
+  if (error) {
+    sendDataToSentry({
+      name: 'Invlid Login',
+      message: 'Invalid username or password',
+      tags: { severity: 'MODERATE' },
+      extra: [{ type: 'errorEncounter', error }],
     });
+  }
+  const handleLogin = () => {
+    if (credentials.username && credentials.password) {
+      checkCredentails({
+        variables: {
+          username: credentials.username,
+          password: credentials.password,
+        },
+        onCompleted: (data) => {
+          if (data.customer.length > 0) {
+            setValid(true);
+            contextValue.setAccessToken(credentials.username);
+            history.push(HOME);
+          } else {
+            setValid(false);
+          }
+        },
+      });
+    } else {
+      setValid(false);
+    }
   };
 
   const handleUsername = (event) => {

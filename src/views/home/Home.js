@@ -32,7 +32,7 @@ function home() {
     console.error(error);
     return <div>Error!</div>;
   }
-  console.log(data.restaurant);
+
   const restaurantArray = data.restaurant.map((restaurantData) => {
     const { name, ratings_aggregate: ratingData } = restaurantData;
     return {

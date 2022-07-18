@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { makeStyles } from '@material-ui/styles';
 import { GET_CUSTOMER_DETAILS } from '../../queries/GET_CUSTOMER_DETAILS';
@@ -7,6 +7,7 @@ import Review from '../../components/Review';
 import { Typography } from '@material-ui/core';
 import { UPDATE_REVIEW } from '../../queries/mutations/UPDATE_REVIEW';
 import { sendDataToSentry } from '../..';
+import { TokenContext } from '../../App';
 
 const useStyles = makeStyles({
   root: {
@@ -16,10 +17,10 @@ const useStyles = makeStyles({
 
 function profile() {
   const classes = useStyles();
-
+  const contextValue = useContext(TokenContext);
   const { loading, error, data } = useQuery(GET_CUSTOMER_DETAILS, {
     variables: {
-      username: 'mayank',
+      username: contextValue.accessToken ?? 'mayank',
     },
   });
 
