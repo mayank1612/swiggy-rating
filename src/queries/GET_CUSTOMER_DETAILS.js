@@ -11,6 +11,7 @@ export const GET_CUSTOMER_DETAILS = gql`
         review
         restaurant {
           name
+          id
         }
       }
     }

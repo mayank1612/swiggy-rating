@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { GET_RESTAURANT_DETAILS } from '../../queries/GET_RESTAURANT_DETAILS';
 import Progress from '../../components/Progress';
 import { useHistory } from 'react-router-dom';
@@ -89,7 +89,15 @@ function Restaurant() {
             ></Rating>
             <div className={classes.reviewWrapper}>
               {ratings?.map((ratingData, index) => {
-                return <Review ratingData={ratingData} key={index} />;
+                const { customer, rating, review } = ratingData;
+                return (
+                  <Review
+                    username={customer.username}
+                    rating={rating}
+                    review={review}
+                    key={index}
+                  />
+                );
               })}
             </div>
           </>

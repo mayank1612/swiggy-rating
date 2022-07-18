@@ -1,7 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { TokenContext } from '../App';
-import { Grid, TextField, Button } from '@material-ui/core';
+import { Grid, TextField, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import { GET_CUSTOMER_DETAILS } from '../queries/GET_CUSTOMER_DETAILS';
+import { useLazyQuery } from '@apollo/client';
 
 const useStyles = makeStyles({
   root: {
@@ -19,13 +21,47 @@ const useStyles = makeStyles({
 
 function LoginPage() {
   const contextValue = useContext(TokenContext);
-  const { username, setUsername } = useState('');
-  const { password, setPassword } = useState('');
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+  });
+  const [valid, setValid] = useState(true);
   const classes = useStyles();
 
+  const [checkCredentails, { loading, error }] = useLazyQuery(
+    GET_CUSTOMER_DETAILS
+  );
+
   const handleLogin = () => {
-    console.log({ username, password });
+    checkCredentails({
+      variables: {
+        username: credentials.username,
+        password: credentials.password,
+      },
+      onCompleted: (data) => {
+        console.log(data);
+        if (data.customer.length > 0) {
+          setValid(false);
+        } else {
+          setValid(true);
+          contextValue.setAccessToken();
+        }
+      },
+    });
   };
+
+  const handleUsername = (event) => {
+    setCredentials((preValue) => {
+      return { ...preValue, username: event.target.value };
+    });
+  };
+
+  const handlePassword = (event) => {
+    setCredentials((preValue) => {
+      return { ...preValue, password: event.target.value };
+    });
+  };
+
   return (
     <Grid container className={classes.root}>
       <Grid item>
@@ -34,10 +70,8 @@ function LoginPage() {
           label="Username"
           variant="outlined"
           className={classes.block}
-          value={username}
-          onChange={(event) => {
-            setUsername(event.target);
-          }}
+          value={credentials?.username}
+          onChange={handleUsername}
         />
       </Grid>
       <Grid item>
@@ -46,13 +80,13 @@ function LoginPage() {
           label="Password"
           variant="outlined"
           className={classes.block}
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          value={password}
+          onChange={handlePassword}
+          type="password"
+          value={credentials?.password}
         />
       </Grid>
       <Grid item>
+        {!valid && <Typography>Invalid Username or Password</Typography>}
         <Button
           className={classes.block}
           color="primary"

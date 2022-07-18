@@ -30,9 +30,9 @@ function App() {
   const [client] = useState(createApolloClient());
   const [accessToken, setAccessToken] = useState();
   const [cookieEnable, setCookieEnable] = useState(true);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {}, [accessToken]);
+  // useEffect(() => {}, [accessToken]);
 
   // if (loading) {
   //   return <Progress />;
