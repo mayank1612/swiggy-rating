@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@apollo/client';
 import { makeStyles } from '@material-ui/styles';
 import { Typography } from '@material-ui/core';
-import { GET_RESTAURANT_DETAILS } from '../../queries/GET_RESTAURANT_DETAILS';
+import { GET_RESTAURANT_SEARCH } from '../../queries/GET_RESTAURANT_SEARCH';
 import Progress from '../../components/Progress';
 import Card from '../../components/Card';
 
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
 
 function home() {
   const classes = useStyles();
-  const { loading, error, data } = useQuery(GET_RESTAURANT_DETAILS);
+  const { loading, error, data } = useQuery(GET_RESTAURANT_SEARCH);
 
   if (loading) {
     return <Progress />;

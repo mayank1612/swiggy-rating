@@ -1,10 +1,56 @@
-import React from 'react';
-import { useQuery } from '@apollo/client';
+import React, { useEffect } from 'react';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_RESTAURANT_DETAILS } from '../../queries/GET_RESTAURANT_DETAILS';
 import Progress from '../../components/Progress';
+import { useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/styles';
+import { Typography } from '@material-ui/core';
+import { Rating } from '@material-ui/lab';
+import { HOME } from '../../routes/PathConstants';
+import { getParameterByName } from '../../utils/getParams';
+import Review from '../../components/Review';
+
+const useStyles = makeStyles({
+  root: {
+    padding: '10px 20px',
+  },
+  heading: {
+    fontSize: '30px',
+  },
+  subHeading: {
+    fontSize: '20px',
+  },
+  cardWrapper: {
+    paddingLeft: '3%',
+    paddingRight: '3%',
+  },
+  reviewWrapper: {
+    margin: '20px 0px',
+  },
+});
 
 function Restaurant() {
-  const { loading, error, data } = useQuery(GET_RESTAURANT_DETAILS);
+  const history = useHistory();
+  const classes = useStyles();
+  const searchKey = 'restaurant_name';
+
+  const [getRestaurantDetails, { loading, error, data }] = useLazyQuery(
+    GET_RESTAURANT_DETAILS
+  );
+
+  useEffect(() => {
+    const searchValue = getParameterByName(searchKey);
+
+    if (searchValue) {
+      getRestaurantDetails({
+        variables: {
+          name: searchValue,
+        },
+      });
+    } else {
+      history.push(HOME);
+    }
+  }, []);
 
   if (loading) {
     return <Progress />;
@@ -13,8 +59,46 @@ function Restaurant() {
     console.error(error);
     return <div>Error!</div>;
   }
-  console.log(data);
-  return <div>Restaurant</div>;
+
+  if (data?.restaurant) {
+    if (data?.restaurant.length === 0) {
+      history.push(HOME);
+    }
+    const resData = data.restaurant[0];
+    console.log(resData);
+    const {
+      name: restaurantName,
+      ratings,
+      ratings_aggregate: ratingAggregate,
+    } = resData;
+    const avgRating = ratingAggregate.aggregate.avg.rating;
+    return (
+      <div className={classes.root}>
+        <Typography className={classes.heading}>{restaurantName}</Typography>
+        {ratings.length === 0 ? (
+          <Typography className={classes.subHeading}>
+            No Reviews Yet!
+          </Typography>
+        ) : (
+          <>
+            <Rating
+              className={classes.center}
+              name="read-only"
+              value={avgRating}
+              readOnly
+            ></Rating>
+            <div className={classes.reviewWrapper}>
+              {ratings?.map((ratingData, index) => {
+                return <Review ratingData={ratingData} key={index} />;
+              })}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  return <Progress />;
 }
 
 export default Restaurant;
