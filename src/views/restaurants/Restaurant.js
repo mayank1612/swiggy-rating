@@ -63,47 +63,47 @@ function Restaurant() {
   if (data?.restaurant) {
     if (data?.restaurant.length === 0) {
       history.push(HOME);
+    } else {
+      const resData = data.restaurant[0];
+      const {
+        name: restaurantName,
+        ratings,
+        ratings_aggregate: ratingAggregate,
+      } = resData;
+      const avgRating = ratingAggregate.aggregate.avg.rating;
+      return (
+        <div className={classes.root}>
+          <Typography className={classes.heading}>{restaurantName}</Typography>
+          {ratings.length === 0 ? (
+            <Typography className={classes.subHeading}>
+              No Reviews Yet!
+            </Typography>
+          ) : (
+            <>
+              <Rating
+                className={classes.center}
+                name="read-only"
+                value={avgRating}
+                readOnly
+              ></Rating>
+              <div className={classes.reviewWrapper}>
+                {ratings?.map((ratingData, index) => {
+                  const { customer, rating, review } = ratingData;
+                  return (
+                    <Review
+                      username={customer.username}
+                      rating={rating}
+                      review={review}
+                      key={index}
+                    />
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      );
     }
-    const resData = data.restaurant[0];
-    console.log(resData);
-    const {
-      name: restaurantName,
-      ratings,
-      ratings_aggregate: ratingAggregate,
-    } = resData;
-    const avgRating = ratingAggregate.aggregate.avg.rating;
-    return (
-      <div className={classes.root}>
-        <Typography className={classes.heading}>{restaurantName}</Typography>
-        {ratings.length === 0 ? (
-          <Typography className={classes.subHeading}>
-            No Reviews Yet!
-          </Typography>
-        ) : (
-          <>
-            <Rating
-              className={classes.center}
-              name="read-only"
-              value={avgRating}
-              readOnly
-            ></Rating>
-            <div className={classes.reviewWrapper}>
-              {ratings?.map((ratingData, index) => {
-                const { customer, rating, review } = ratingData;
-                return (
-                  <Review
-                    username={customer.username}
-                    rating={rating}
-                    review={review}
-                    key={index}
-                  />
-                );
-              })}
-            </div>
-          </>
-        )}
-      </div>
-    );
   }
 
   return <Progress />;

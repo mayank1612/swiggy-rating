@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useLazyQuery } from '@apollo/client';
 import { makeStyles } from '@material-ui/styles';
 import {
   Avatar,
@@ -38,10 +37,11 @@ function Review({ username, rating, review, update = false, callback }) {
   const [updatedRating, setUpdatedRating] = useState(rating);
   const [updatedReview, setUpdatedReview] = useState(review);
 
-  const handleChange = () => {
+  const handleChange = (event) => {
     setNeedUpdate((value) => !value);
-    console.log({ updatedRating, updatedReview });
-    callback(updatedRating, updatedReview);
+    if (event.target.innerText === 'SAVE') {
+      callback(updatedRating, updatedReview);
+    }
   };
 
   return (
@@ -88,7 +88,9 @@ function Review({ username, rating, review, update = false, callback }) {
             size="small"
             variant="contained"
             color="primary"
-            onClick={handleChange}
+            onClick={(event) => {
+              handleChange(event);
+            }}
           >
             {needUpadte ? 'Save' : 'Update'}
           </Button>

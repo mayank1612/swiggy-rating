@@ -31,10 +31,10 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
-        {checkCookie && checkCookie !== '' && <Navbar />}
+        {/* {checkCookie && checkCookie !== '' && <Navbar />} */}
         <Navbar />
         <Routes />
-        {checkCookie && checkCookie !== '' && <Footer />}
+        {/* {checkCookie && checkCookie !== '' && <Footer />} */}
         <Footer />
       </BrowserRouter>
     </ApolloProvider>
